@@ -95,35 +95,25 @@ function onListening() {
 var io = require('socket.io')(server);
 
 io.on('connection', function (socket) {
-  //socket.emit('request-state', { hello: 'world' });
 
   var code = Math.round(Math.random() * 10000);
 
-  console.log('new connection', code);
+  //console.log('new connection', code);
 
   socket.emit('send-match-code', JSON.stringify({code: code}));
 
   socket.on('join-match', function (data) {
-    //console.log('join-match', data);
     data = JSON.parse(data);
-    //console.log('join-match', data.code, data);
     socket.join(data.code);
-
     socket.broadcast.to(data.room).emit('state-requested', JSON.stringify(data));
   });
 
   socket.on('send-state', function (data) {
-    //console.log('1send-state', data);
     data = JSON.parse(data);
-    //console.log('2send-state', data.room, data);
-    //socket.emit('send-state', data);
     socket.broadcast.to(data.room).emit('new-state',  JSON.stringify(data));
   });
   socket.on('request-state', function (data) {
-    console.log('request-state', data);
     data = JSON.parse(data);
-    //console.log('request-state', data.room, data);
-    //socket.emit('request-state', data);
     socket.broadcast.to(data.room).emit('state-requested',  JSON.stringify(data));
   });
 });

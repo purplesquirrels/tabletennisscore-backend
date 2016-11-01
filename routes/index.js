@@ -7,6 +7,12 @@ var router = express.Router();
 router.get('/broadcast', function(req, res, next) {
 	res.redirect("/");
 });
+router.get('/sandbox', function(req, res, next) {
+	res.redirect("/");
+});
+router.get('/start', function(req, res, next) {
+	res.redirect("/");
+});
 router.get('/view', function(req, res, next) {
   //res.sendFile('./index.html');
   res.sendFile(path.join(__dirname,  "/../public/index.html"));
