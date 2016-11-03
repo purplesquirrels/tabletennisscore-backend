@@ -8,7 +8,8 @@ coverage
 
 # production
 build
-public
+public/*
+!public/.gitkeep
 
 # misc
 .DS_Store
