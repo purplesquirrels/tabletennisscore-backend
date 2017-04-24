@@ -100,6 +100,10 @@ io.on('connection', function (socket) {
 
   //console.log('new connection', code);
 
+  var pinger = setInterval(function() {
+    socket.emit('ping', {ping:1});
+  }, 5000);
+
   socket.emit('send-match-code', JSON.stringify({code: code}));
 
   socket.on('join-match', function (data) {
