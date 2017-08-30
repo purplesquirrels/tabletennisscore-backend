@@ -92,32 +92,59 @@ function onListening() {
 
 
 
-var io = require('socket.io')(server);
+const io = require('socket.io')(server);
+const matches = [];
 
-io.on('connection', function (socket) {
+function createMatchCode() {
 
-  var code = Math.round(Math.random() * 10000);
+  let code;
 
-  //console.log('new connection', code);
+  while (!code || matches.includes(code)) {
+    code = Math.round(Math.random() * 10000);
+  }
 
-  var pinger = setInterval(function () {
+  return code;
+}
+
+io.on('connection', (socket) => {
+
+  const code = createMatchCode();
+
+  matches.push(code);
+
+  const pinger = setInterval(() => {
     socket.emit('ping', { ping: 1 });
   }, 5000);
 
-  socket.emit('send-match-code', JSON.stringify({ code: code }));
+  socket.emit('send-match-code', JSON.stringify({ code }));
 
-  socket.on('join-match', function (data) {
-    data = JSON.parse(data);
-    socket.join(data.code);
-    socket.broadcast.to(data.room).emit('state-requested', JSON.stringify(data));
+  socket.on('join-match', (json) => {
+    let data;
+    try {
+      data = JSON.parse(json);
+    } catch (e) { };
+    if (data) {
+      socket.join(data.code);
+      socket.broadcast.to(data.room).emit('state-requested', json);
+    }
   });
 
-  socket.on('send-state', function (data) {
-    data = JSON.parse(data);
-    socket.broadcast.to(data.room).emit('new-state', JSON.stringify(data));
+  socket.on('send-state', (json) => {
+    let data;
+    try {
+      data = JSON.parse(json);
+    } catch (e) { };
+    if (data) {
+      socket.broadcast.to(data.room).emit('new-state', json);
+    }
   });
-  socket.on('request-state', function (data) {
-    data = JSON.parse(data);
-    socket.broadcast.to(data.room).emit('state-requested', JSON.stringify(data));
+  socket.on('request-state', (json) => {
+    let data;
+    try {
+      data = JSON.parse(json);
+    } catch (e) { };
+    if (data) {
+      socket.broadcast.to(data.room).emit('state-requested', json);
+    }
   });
 });
